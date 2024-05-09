@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <style>
+      /* Style for the response container */
+      #response-container {
+        width: 300px; /* Adjust width as needed */
+        height: 300px; /* Adjust height as needed */
+        border: 1px solid #ccc;
+        overflow: auto; /* Enable scrolling */
+        margin: 20px auto; /* Center the container */
+        padding: 10px;
+        position: relative; /* Positioning for button */
+      }
+
+      .copy-button {
+        position: absolute;
+        top: 10px; /* Adjust top position */
+        right: 10px; /* Adjust right position */
+        padding: 5px 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="country-code-section">
+      <input id="country-code-input" placeholder="Enter country code" />
+    </div>
+
+    <div id="mobile-section">
+      <input id="mobile-input" placeholder="Enter mobile number" />
+      <button onclick="phoneAuth()">Request OTP</button>
+    </div>
+
+    <div id="otp-section">
+      <input id="otp-input" placeholder="Enter OTP" />
+      <button onclick="verifyOTP()">Verify OTP</button>
+    </div>
+
+    <button onclick="oAuth('SMS')">Authenticate with WhatsApp</button>
+    <button onclick="oAuth('GMAIL')">Authenticate with Gmail</button>
+    <div id="response-container">RESPONSE</div>
+  </body>
+  <script
+    id="otpless-sdk"
+    src="https://otpless.com/v2/headless.js"
+    data-appid="RM2I31PAOMTTAJ0UGFLP"
+  ></script>
+  <script>
+    const callback = (userinfo) => {
+      alert(JSON.stringify(userinfo));
+      const emailMap = userinfo.identities.find(
+        (item) => item.identityType === "EMAIL"
+      );
+
+      const mobileMap = userinfo.identities.find(
+        (item) => item.identityType === "MOBILE"
+      )?.identityValue;
+
+      const token = userinfo.token;
+
+      const email = emailMap?.identityValue;
+
+      const mobile = mobileMap?.identityValue;
+
+      const name = emailMap?.name || mobileMap?.name;
+
+      console.log(userinfo);
+    };
+
+    const OTPlessSignin = new OTPless(callback);
+    let phno = "";
+    let countryCode; // Define countryCode as a global variable
+
+    const displayResponse = (response) => {
+      const responseContainer = document.getElementById("response-container");
+      responseContainer.innerHTML = `<pre>${JSON.stringify(
+        response,
+        null,
+        2
+      )}</pre>`; // Display response JSON with formatting
+
+      // Create a copy button
+      const copyButton = document.createElement("button");
+      copyButton.textContent = "Copy Response";
+      copyButton.classList.add("copy-button");
+      copyButton.onclick = () => {
+        const responseText = responseContainer.innerText;
+        navigator.clipboard
+          .writeText(responseText)
+          .then(() => {
+            alert("Response copied to clipboard!");
+          })
+          .catch((error) => {
+            console.error("Failed to copy response:", error);
+          });
+      };
+      responseContainer.appendChild(copyButton);
+    };
+
+    const phoneAuth = async () => {
+      countryCode = document.getElementById("country-code-input").value; // Assign value to the global countryCode variable
+      phno = document.getElementById("mobile-input").value;
+      console.log("called");
+
+      const res = await OTPlessSignin.initiate({
+        channel: "PHONE",
+        phone: phno,
+        countryCode: countryCode,
+      });
+
+      alert(JSON.stringify(res));
+      displayResponse(res);
+    };
+
+    const verifyOTP = async () => {
+      const otp = document.getElementById("otp-input").value; // Get OTP from input field
+      console.log(phno, otp);
+      const response = await OTPlessSignin.verify({
+        channel: "PHONE",
+        phone: phno,
+        otp: otp,
+        countryCode: countryCode, // Use the global countryCode variable
+      });
+      console.log("Response from OTP verification:", response);
+
+      if (response.statusCode === 200 && response.success) {
+        // OTP verification was successful
+        console.log("OTP verification successful");
+        console.log("Verification details:", response.response);
+      } else {
+        console.error("OTP verification failed");
+        console.error("Error message:", response.response.errorMessage);
+        console.error("Error details:", response.response.details);
+      }
+    };
+
+    const oAuth = async (params) => {
+      const res = await OTPlessSignin.initiate({
+        channel: "OAUTH",
+        channelType: params,
+      });
+      alert(JSON.stringify(res));
+    };
+  </script>
+  <button onclick="renderEmailPage()">Email Authentication</button>
+  <script>
+    function renderEmailPage() {
+      window.location.href = "emailauth.html";
+    }
+  </script>
+</html>

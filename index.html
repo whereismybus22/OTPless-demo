@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="https://otpless.com/favicon.ico"
+    />
+    <title>OTPless Login Page</title>
+  </head>
+  <body>
+    <button onclick="renderHeadlessPage()">Headless</button>
+    <button onclick="renderPrebuiltPage()">Prebuilt</button>
+
+    <script>
+      function renderHeadlessPage() {
+        window.location.href = "headlessjs.html";
+      }
+    </script>
+
+    <script>
+      function renderPrebuiltPage() {
+        window.location.href = "prebuiltjs.html";
+      }
+    </script>
+  </body>
+</html>

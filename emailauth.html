@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Email Authentication</title>
+  </head>
+  <body>
+    <div id="email-section">
+      <input id="email-input" placeholder="Enter email address" />
+      <button onclick="emailAuth()">Request OTP</button>
+    </div>
+
+    <div id="otp-section" style="display: none">
+      <input id="otp-input" placeholder="Enter OTP" />
+      <button onclick="verifyOTP()">Verify OTP</button>
+    </div>
+
+    <div id="response-container"></div>
+
+    <script
+      id="otpless-sdk"
+      src="https://otpless.com/v2/headless.js"
+      data-appid="RM2I31PAOMTTAJ0UGFLP"
+    ></script>
+    <script>
+      const OTPlessSignin = new OTPless();
+
+      const displayResponse = (response) => {
+        const responseContainer = document.getElementById("response-container");
+        responseContainer.innerHTML = `<pre>${JSON.stringify(
+          response,
+          null,
+          2
+        )}</pre>`;
+
+        const copyButton = document.createElement("button");
+        copyButton.textContent = "Copy Response";
+        copyButton.onclick = () => {
+          const responseText = responseContainer.innerText;
+          navigator.clipboard
+            .writeText(responseText)
+            .then(() => {
+              alert("Response copied to clipboard!");
+            })
+            .catch((error) => {
+              console.error("Failed to copy response:", error);
+            });
+        };
+        responseContainer.appendChild(copyButton);
+      };
+
+      const emailAuth = async () => {
+        const email = document.getElementById("email-input").value;
+        console.log("Email:", email);
+        const response = await OTPlessSignin.initiate({
+          channel: "EMAIL",
+          email: email,
+        });
+        console.log("Response from email authentication:", response);
+        displayResponse(response);
+
+        document.getElementById("otp-section").style.display = "block";
+      };
+
+      const verifyOTP = async () => {
+        const otp = document.getElementById("otp-input").value;
+        const email = document.getElementById("email-input").value;
+        console.log("Verifying OTP:", otp);
+        const response = await OTPlessSignin.verify({
+          channel: "EMAIL",
+          email: email,
+          otp: otp,
+        });
+        console.log("Response from OTP verification:", response);
+        displayResponse(response);
+      };
+    </script>
+  </body>
+</html>
