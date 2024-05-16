@@ -9,18 +9,48 @@
       href="https://otpless.com/favicon.ico"
     />
     <title>OTPless Login Page</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      button {
+        padding: 12px 24px;
+        margin: 0 10px;
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        box-shadow: 0px 2px 3px 0px;
+      }
+
+      button:hover {
+        background-color: #4caf50;
+        color: white;
+      }
+
+      button:focus {
+        outline: none;
+      }
+    </style>
   </head>
   <body>
-    <button onclick="renderHeadlessPage()">Headless</button>
     <button onclick="renderPrebuiltPage()">Prebuilt</button>
+    <button onclick="renderHeadlessPage()">Headless</button>
 
     <script>
       function renderHeadlessPage() {
         window.location.href = "headlessjs.html";
       }
-    </script>
 
-    <script>
       function renderPrebuiltPage() {
         window.location.href = "prebuiltjs.html";
       }

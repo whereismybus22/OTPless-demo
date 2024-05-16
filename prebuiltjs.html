@@ -10,37 +10,79 @@
     />
     <title>OTPless Login Page</title>
     <style>
-      .response-container {
-        margin-top: 20px;
-        border: 1px solid #ccc;
-        max-width: 600px;
-        height: 600px;
-        width: 400px;
-        overflow-x: auto;
-        overflow-y: auto;
-        border: 1px solid #ccc;
-        box-shadow: 0px 2px 3px 0px #ccc;
-        border-radius: 10px;
-        padding: 10px;
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
       }
+
       .container {
         display: flex;
         align-items: center;
         justify-content: space-around;
-      }
-      .response-container pre {
-        white-space: pre-wrap;
-      }
-      .copy-button {
-        margin-top: 10px;
-        padding: 10px 20px;
-        cursor: pointer;
+        width: 1000px;
+        margin: 20px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0px 2px 3px 0px #ccc;
+        padding: 20px;
       }
 
-      @media screen and (max-width: 600px) {
-        .container {
-          flex-direction: column;
-        }
+      .response-container {
+        width: 400px;
+        height: 400px;
+        overflow-x: auto;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        padding: 10px;
+      }
+
+      .response-container h2 {
+        text-align: center;
+        margin-top: 0;
+      }
+
+      .response-container pre {
+        white-space: pre-wrap;
+        margin-top: 10px;
+      }
+
+      .copy-button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        cursor: pointer;
+        background-color: #4caf50;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+      }
+
+      .copy-button:hover {
+        background-color: #45a049;
+      }
+      button {
+        padding: 12px 24px;
+        margin: 0 10px;
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        /* border: 0.5px solid #000; */
+        box-shadow: 0px 2px 4px 0px;
+      }
+
+      button:hover {
+        background-color: #4caf50;
+        color: white;
       }
     </style>
   </head>
@@ -52,7 +94,7 @@
         id="otpless-sdk"
         type="text/javascript"
         src="https://otpless.com/v2/auth.js"
-        data-appid="RM2I31PAOMTTAJ0UGFLP"
+        data-appid="YOUR_APP_ID"
       ></script>
 
       <div class="response-container">
@@ -63,6 +105,7 @@
         <pre id="response"></pre>
       </div>
     </div>
+    <button onclick="renderHeadlessPage()">Headless</button>
 
     <script type="text/javascript">
       function otpless(otplessUser) {
@@ -80,6 +123,10 @@
         navigator.clipboard.writeText(responsePre.textContent).then(() => {
           alert("Response copied to clipboard!");
         });
+      }
+
+      function renderHeadlessPage() {
+        window.location.href = "headlessjs.html";
       }
     </script>
   </body>

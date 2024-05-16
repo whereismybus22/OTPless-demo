@@ -5,27 +5,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login</title>
     <style>
-      /* Style for the response container */
-      #response-container {
-        width: 300px; /* Adjust width as needed */
-        height: 300px; /* Adjust height as needed */
-        border: 1px solid #ccc;
-        overflow: auto; /* Enable scrolling */
-        margin: 20px auto; /* Center the container */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      input,
+      button {
+        margin: 5px;
         padding: 10px;
-        position: relative; /* Positioning for button */
+        border-radius: 5px;
+        border: none;
+        font-size: 16px;
+      }
+
+      #country-code-section,
+      #mobile-section,
+      #otp-section {
+        margin-bottom: 20px;
+      }
+
+      button {
+        background-color: #007bff;
+        color: #fff;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      #response-container {
+        width: 300px;
+        height: 300px;
+        border: 1px solid #ccc;
+        overflow: auto;
+        margin: 20px auto;
+        padding: 10px;
+        position: relative;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0px 2px 3px 0px #ccc;
       }
 
       .copy-button {
+        margin-top: 10px; /* Added margin */
         position: absolute;
-        top: 10px; /* Adjust top position */
-        right: 10px; /* Adjust right position */
+        top: 10px;
+        right: 10px;
         padding: 5px 10px;
         background-color: #007bff;
         color: #fff;
         border: none;
         border-radius: 5px;
         cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .copy-button:hover {
+        background-color: #0056b3;
       }
     </style>
   </head>
@@ -39,121 +84,135 @@
       <button onclick="phoneAuth()">Request OTP</button>
     </div>
 
-    <div id="otp-section">
+    <div id="otp-section" style="display: none">
       <input id="otp-input" placeholder="Enter OTP" />
       <button onclick="verifyOTP()">Verify OTP</button>
     </div>
-
-    <button onclick="oAuth('SMS')">Authenticate with WhatsApp</button>
-    <button onclick="oAuth('GMAIL')">Authenticate with Gmail</button>
     <div id="response-container">RESPONSE</div>
-  </body>
-  <script
-    id="otpless-sdk"
-    src="https://otpless.com/v2/headless.js"
-    data-appid="RM2I31PAOMTTAJ0UGFLP"
-  ></script>
-  <script>
-    const callback = (userinfo) => {
-      alert(JSON.stringify(userinfo));
-      const emailMap = userinfo.identities.find(
-        (item) => item.identityType === "EMAIL"
-      );
 
-      const mobileMap = userinfo.identities.find(
-        (item) => item.identityType === "MOBILE"
-      )?.identityValue;
+    <button onclick="renderEmailPage()">Email Authentication</button>
+    <button onclick="oAuth('WHATSAPP')">Authenticate with WhatsApp</button>
+    <button onclick="oAuth('GMAIL')">Authenticate with Gmail</button>
+    <button onclick="renderHomePage()">Home</button>
 
-      const token = userinfo.token;
+    <script
+      id="otpless-sdk"
+      src="https://otpless.com/v2/headless.js"
+      data-appid="YOUR_APP_ID"
+    ></script>
+    <script>
+      const OTPlessSignin = new OTPless((userinfo) => {
+        alert(JSON.stringify(userinfo));
+        const emailMap = userinfo.identities.find(
+          (item) => item.identityType === "EMAIL"
+        );
 
-      const email = emailMap?.identityValue;
+        const mobileMap = userinfo.identities.find(
+          (item) => item.identityType === "MOBILE"
+        )?.identityValue;
 
-      const mobile = mobileMap?.identityValue;
+        const token = userinfo.token;
 
-      const name = emailMap?.name || mobileMap?.name;
+        const email = emailMap?.identityValue;
 
-      console.log(userinfo);
-    };
+        const mobile = mobileMap?.identityValue;
 
-    const OTPlessSignin = new OTPless(callback);
-    let phno = "";
-    let countryCode; // Define countryCode as a global variable
+        const name = emailMap?.name || mobileMap?.name;
 
-    const displayResponse = (response) => {
-      const responseContainer = document.getElementById("response-container");
-      responseContainer.innerHTML = `<pre>${JSON.stringify(
-        response,
-        null,
-        2
-      )}</pre>`; // Display response JSON with formatting
+        console.log(userinfo);
+      });
 
-      // Create a copy button
-      const copyButton = document.createElement("button");
-      copyButton.textContent = "Copy Response";
-      copyButton.classList.add("copy-button");
-      copyButton.onclick = () => {
-        const responseText = responseContainer.innerText;
-        navigator.clipboard
-          .writeText(responseText)
-          .then(() => {
-            alert("Response copied to clipboard!");
-          })
-          .catch((error) => {
-            console.error("Failed to copy response:", error);
-          });
+      let phno = "";
+      let countryCode;
+
+      const displayResponse = (response) => {
+        const responseContainer = document.getElementById("response-container");
+        responseContainer.innerHTML = `<pre>${JSON.stringify(
+          response,
+          null,
+          2
+        )}</pre>`;
+        const copyButton = document.createElement("button");
+        copyButton.textContent = "Copy Response";
+        copyButton.classList.add("copy-button");
+        copyButton.onclick = () => {
+          const responseText = responseContainer.innerText;
+          navigator.clipboard
+            .writeText(responseText)
+            .then(() => {
+              alert("Response copied to clipboard!");
+            })
+            .catch((error) => {
+              console.error("Failed to copy response:", error);
+            });
+        };
+        responseContainer.appendChild(copyButton);
       };
-      responseContainer.appendChild(copyButton);
-    };
 
-    const phoneAuth = async () => {
-      countryCode = document.getElementById("country-code-input").value; // Assign value to the global countryCode variable
-      phno = document.getElementById("mobile-input").value;
-      console.log("called");
+      const phoneAuth = async () => {
+        countryCode = document.getElementById("country-code-input").value;
+        phno = document.getElementById("mobile-input").value;
 
-      const res = await OTPlessSignin.initiate({
-        channel: "PHONE",
-        phone: phno,
-        countryCode: countryCode,
-      });
+        const res = await OTPlessSignin.initiate({
+          channel: "PHONE",
+          phone: phno,
+          countryCode: countryCode,
+        });
 
-      alert(JSON.stringify(res));
-      displayResponse(res);
-    };
+        alert(JSON.stringify(res));
+        displayResponse(res);
 
-    const verifyOTP = async () => {
-      const otp = document.getElementById("otp-input").value; // Get OTP from input field
-      console.log(phno, otp);
-      const response = await OTPlessSignin.verify({
-        channel: "PHONE",
-        phone: phno,
-        otp: otp,
-        countryCode: countryCode, // Use the global countryCode variable
-      });
-      console.log("Response from OTP verification:", response);
+        document.getElementById("otp-section").style.display = "block";
+      };
 
-      if (response.statusCode === 200 && response.success) {
-        // OTP verification was successful
-        console.log("OTP verification successful");
-        console.log("Verification details:", response.response);
-      } else {
-        console.error("OTP verification failed");
-        console.error("Error message:", response.response.errorMessage);
-        console.error("Error details:", response.response.details);
+      const verifyOTP = async () => {
+        const otp = document.getElementById("otp-input").value;
+
+        const response = await OTPlessSignin.verify({
+          channel: "PHONE",
+          phone: phno,
+          otp: otp,
+          countryCode: countryCode,
+        });
+
+        const responseContainer = document.getElementById("response-container");
+        responseContainer.innerHTML = `<pre>${JSON.stringify(
+          response,
+          null,
+          2
+        )}</pre>`;
+
+        const copyButton = document.createElement("button");
+        copyButton.textContent = "Copy Response";
+        copyButton.classList.add("copy-button");
+        copyButton.onclick = () => {
+          const responseText = responseContainer.innerText;
+          navigator.clipboard
+            .writeText(responseText)
+            .then(() => {
+              alert("Response copied to clipboard!");
+            })
+            .catch((error) => {
+              console.error("Failed to copy response:", error);
+            });
+        };
+        responseContainer.appendChild(copyButton);
+      };
+
+      const oAuth = async (params) => {
+        const res = await OTPlessSignin.initiate({
+          channel: "OAUTH",
+          channelType: params,
+        });
+        alert(JSON.stringify(res));
+      };
+
+      function renderEmailPage() {
+        window.location.href = "emailauth.html";
       }
-    };
-
-    const oAuth = async (params) => {
-      const res = await OTPlessSignin.initiate({
-        channel: "OAUTH",
-        channelType: params,
-      });
-      alert(JSON.stringify(res));
-    };
-  </script>
-  <button onclick="renderEmailPage()">Email Authentication</button>
-  <script>
-    function renderEmailPage() {
-      window.location.href = "emailauth.html";
-    }
-  </script>
+      function renderHomePage() {
+        window.location.href = "index.html";
+      }
+    </script>
+  </body>
 </html>

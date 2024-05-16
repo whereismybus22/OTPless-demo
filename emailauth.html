@@ -4,6 +4,74 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Email Authentication</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      input,
+      button {
+        margin: 5px;
+        padding: 10px;
+        border-radius: 5px;
+        border: none;
+        font-size: 16px;
+      }
+
+      #email-section,
+      #otp-section {
+        margin-bottom: 20px;
+      }
+
+      button {
+        background-color: #007bff;
+        color: #fff;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      #response-container {
+        width: 300px;
+        height: 500;
+        border: 1px solid #ccc;
+        overflow: auto;
+        /* margin: 20px auto; */
+        padding: 10px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0px 2px 3px 0px #ccc;
+      }
+
+      #response-container pre {
+        margin: 0;
+      }
+
+      .copy-button {
+        margin-top: 10px;
+        padding: 5px 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .copy-button:hover {
+        background-color: #0056b3;
+      }
+    </style>
   </head>
   <body>
     <div id="email-section">
@@ -17,11 +85,12 @@
     </div>
 
     <div id="response-container"></div>
+    <button onclick="renderHomePage()">Home</button>
 
     <script
       id="otpless-sdk"
       src="https://otpless.com/v2/headless.js"
-      data-appid="RM2I31PAOMTTAJ0UGFLP"
+      data-appid="YOUR_APP_ID"
     ></script>
     <script>
       const OTPlessSignin = new OTPless();
@@ -36,6 +105,7 @@
 
         const copyButton = document.createElement("button");
         copyButton.textContent = "Copy Response";
+        copyButton.classList.add("copy-button");
         copyButton.onclick = () => {
           const responseText = responseContainer.innerText;
           navigator.clipboard
@@ -75,6 +145,9 @@
         console.log("Response from OTP verification:", response);
         displayResponse(response);
       };
+      function renderHomePage() {
+        window.location.href = "index.html";
+      }
     </script>
   </body>
 </html>
